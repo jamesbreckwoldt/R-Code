@@ -1,0 +1,23 @@
+# Copy table from wikipedia
+library(rvest)
+library(dplyr)
+
+# copy url
+url = "https://en.wikipedia.org/wiki/United_Kingdom"
+
+# On  website, right-click and Inspect.
+# Find the table highlighted. 
+# Copy the xpath string by rightclick -> _Copy_ -> _Copy XPath_. 
+uk = read_html(url) %>% 
+  html_node(xpath =  '//*[@id="mw-content-text"]/div[1]/table[3]') %>% # Paste Xpath
+  html_table(fill = T) 
+uk$Year = as.factor(uk$Year)
+
+# Replace comma numbers with as.numeric
+uk$`Foreign born population of England and Wales` = as.numeric(gsub(",","",uk$`Foreign born population of England and Wales`))
+uk$`Total population[462][463][464][465][466][467]` = as.numeric(gsub(",","",uk$`Total population[462][463][464][465][466][467]`))
+uk$`Irish born population` = as.numeric(gsub(",","",uk$`Irish born population`))
+uk$`Percentage of total population that was born abroad` = as.numeric(gsub(",","",uk$`Percentage of total population that was born abroad` ))
+
+# Rename Variables
+uk = rename(uk, "Total population" = `Total population[462][463][464][465][466][467]`)
