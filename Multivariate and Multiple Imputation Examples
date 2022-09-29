@@ -1,0 +1,25 @@
+library(mice)
+library(missForest)
+library(missRanger)
+library(VIM)
+library(Hmisc)
+library(Zelig)
+library(Amelia)
+
+# see pattern of missingness
+md.pattern(DATAFRAME)
+VIM::aggr(x=DATAFRAME, sortVars=T)
+
+# multivariate imputation - chained tree ensembles
+newdf = missRanger(data = DATAFRAME)
+
+# multivariate imputation - random tree algorithm
+newdf2 = missForest(DATAFRAME)$ximp
+
+# multivariate imputation - multivariate imputation via chained equations (MICE)
+newdf3 = mice(data = DATAFRAME, m = 5, method = 'pmm')
+newdf3 = as_tibble(newdf3$data)
+
+# Multiple Imputation
+a.out = amelia(x = DATASET, m = 5, idvars = c("ID variables dropped from imputation"))
+mult.imputation = zelig(Y ~ X, data=a.out$imputations, model="normal")
